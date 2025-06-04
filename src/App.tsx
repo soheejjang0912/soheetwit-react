@@ -7,6 +7,8 @@ import Login from "./routes/login";
 import CreateAccount from "./routes/create-account";
 import { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
+import { useEffect, useState } from "react";
+import LoadingScreen from "./components/loading-screen";
 
 // 라우터 생성: 경로(path)와 해당 컴포넌트(element)를 연결하는 규칙 정의
 const router = createBrowserRouter([ // 배열을 router에 전달
@@ -54,12 +56,21 @@ const GlobalStyles = createGlobalStyle`
 // App 안에서 렌더링됨
 /*
 <RouterProvider router={router} />
-위에서 정의한 router를 실제 앱에 적용해줘
+위에서 정의한 router를 실제 앱에 적용
 */
 
 function App() {
+  const [isLoading, setLoading] = useState(true); //Firebase authentication
+  const init = async()=>{
+    //wait for firebase
+    setLoading(false); //파이어 베이스가 준비 되면 loading을 false로 변경
+  }
+  useEffect(()=>{
+    init();
+  }, []);
   return <>
     <GlobalStyles />
+    {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
     <RouterProvider router={router} />
   </>;
 }
