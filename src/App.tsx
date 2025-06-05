@@ -10,22 +10,26 @@ import reset from "styled-reset";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
+import ProtectedRoute from "./components/protected-route";
 
 // 라우터 생성: 경로(path)와 해당 컴포넌트(element)를 연결하는 규칙 정의
 const router = createBrowserRouter([ // 배열을 router에 전달
   {
     path:"/", // 어떤 경로에 대한 규칙인지 지정, 루트 경로
-    element: <Layout />, // 이 경로에서 먼저 렌더링할 컴포넌트 (공통 레이아웃)
-    
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ), // 이 경로에서 먼저 렌더링할 컴포넌트 (공통 레이아웃)
     // element인 Layout 내부에서 <Outlet /> 위치에 랜더링될 자식 경로들 정의
     children: [
       {
         path: "", 
-        element: <Home />, 
+        element: <Home />
       },
       {
         path: "profile",
-        element: <Profile />, 
+        element: <Profile />
       },
     ]
   },
