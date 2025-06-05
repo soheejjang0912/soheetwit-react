@@ -5,7 +5,7 @@ import Home from "./routes/home";
 import Profile from "./routes/profile";
 import Login from "./routes/login";
 import CreateAccount from "./routes/create-account";
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 import reset from "styled-reset";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
@@ -54,12 +54,17 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+const Wrapper = styled.div`
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+`;
+
 // App 안에서 렌더링됨
 /*
 <RouterProvider router={router} />
 위에서 정의한 router를 실제 앱에 적용
 */
-
 function App() {
   const [isLoading, setLoading] = useState(true); // Firebase authentication
   const init = async()=>{
@@ -72,11 +77,10 @@ function App() {
   useEffect(()=>{
     init();
   }, []);
-  return <>
+  return <Wrapper>
     <GlobalStyles />
     {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
-    <RouterProvider router={router} />
-  </>;
+  </Wrapper>;
 }
 
 export default App
