@@ -1,5 +1,8 @@
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import styled from "styled-components"
+import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
     height: 100%;
@@ -42,7 +45,7 @@ const Error = styled.span`
 
 // CreateAccount 컴포넌트 정의
 export default function CreateAccount(){
-
+    const navigate = useNavigate();
     const [isLoading, setLoading] = useState(false);
     
     // 각각 사용자 입력을 저장할 상태 변수 정의
@@ -65,13 +68,21 @@ export default function CreateAccount(){
         } 
     }
 
-    const onSubmit = (e : React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = async (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // 기본 폼 제출 동작 방지 (페이지 새로고침 방지)
+        if(isLoading || name === "" || email ==="" || password ==="") return;
         try{
-            // create an account
-            // set the name of the user
-            // redirect to the home page
+            setLoading(true);
+            // 성공 시 자격 증명을 받음
+            const credentials = await createUserWithEmailAndPassword(auth, email, password);
+            console.log(credentials.user);
+            await updateProfile(credentials.user, {
+                displayName: name,
+            });
+            navigate("/");
         }catch(e){
+            // 성공하지 못하면 오류가 발생 
+            // (해당 이메일로 이미 계정이 있거나 비밀번호가 유효하지 않은 경우)
             console.log(e);
         }finally{
             setLoading(false);
@@ -83,7 +94,7 @@ export default function CreateAccount(){
     // 실제 렌더링되는 JSX 반환
     return (
         <Wrapper>
-            <Title>Log into soheetwit🐥</Title>
+            <Title>Join soheetwit 🐥</Title>
             <Form onSubmit={onSubmit}>
                 <Input onChange={onChange} name="name" value={name}  placeholder="Name" type="text" required/>
                 <Input onChange={onChange} name="email" value={email} placeholder="Email" type="email" required/>
