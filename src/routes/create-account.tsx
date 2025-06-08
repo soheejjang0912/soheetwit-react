@@ -1,47 +1,9 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
-import styled from "styled-components"
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
-
-const Wrapper = styled.div`
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 420px;
-    padding: 50px 0px;
-`;
-
-const Title = styled.h1`
-    font-size: 42px;
-`;
-
-const Form = styled.form`
-    margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-`;
-
-const Input = styled.input`
-    padding: 10px 20px;
-    border-radius: 50px;
-    border: none;
-    width: 100%;
-    font-size: 16px;
-    &[type="submit"]{
-        cursor: pointer;
-        &:hover{
-            opacity: 0.8;
-        }
-    }
-`;
-const Error = styled.span`
-    font-weight: 600px;
-    color: tomato;
-`;
+import { Link, useNavigate } from "react-router-dom";
+import { FirebaseError } from "firebase/app";
+import { Error, Form, Input, Swither, Title, Wrapper } from "../components/auth-components";
 
 // CreateAccount 컴포넌트 정의
 export default function CreateAccount(){
@@ -54,7 +16,7 @@ export default function CreateAccount(){
     const [password, setPassword] = useState("");
 
     // 에러 관련 처리
-    const [error] = useState("");
+    const [error, setError] = useState("");
 
     // 입력 필드(onChange 이벤트) 변경 시 호출되는 함수
     const onChange = (e : React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +32,7 @@ export default function CreateAccount(){
 
     const onSubmit = async (e : React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // 기본 폼 제출 동작 방지 (페이지 새로고침 방지)
+        setError(""); // 버튼 클릭시 에러 메시지 포멧을 위함
         if(isLoading || name === "" || email ==="" || password ==="") return;
         try{
             setLoading(true);
@@ -82,7 +45,11 @@ export default function CreateAccount(){
             navigate("/");
         }catch(e){
             // 성공하지 못하면 오류가 발생 
-            // (해당 이메일로 이미 계정이 있거나 비밀번호가 유효하지 않은 경우)
+            // (해당 이메일로 이미 계정이 있거나 비밀번호가 유효하지 않은 경우) 
+            if(e instanceof FirebaseError){
+                console.log("e code : "+ e.code, ", e.message : "+ e.message); // e code : auth/email-already-in-use , e.message : Firebase: Error (auth/email-already-in-use).
+                setError(e.message);
+            }
             console.log(e);
         }finally{
             setLoading(false);
@@ -94,7 +61,7 @@ export default function CreateAccount(){
     // 실제 렌더링되는 JSX 반환
     return (
         <Wrapper>
-            <Title>Join soheetwit 🐥</Title>
+            <Title>Join soheetwit</Title>
             <Form onSubmit={onSubmit}>
                 <Input onChange={onChange} name="name" value={name}  placeholder="Name" type="text" required/>
                 <Input onChange={onChange} name="email" value={email} placeholder="Email" type="email" required/>
@@ -103,6 +70,12 @@ export default function CreateAccount(){
                     value={isLoading ? "Loading..." : "Create Acount"}/>
             </Form>
             {error !== "" ? <Error>{error}</Error> : null}
+
+            <Swither>
+                Already have an account?{" "}
+                <Link to="/login">Log in</Link>
+            </Swither>
+
         </Wrapper>
     )
 }
