@@ -4,6 +4,7 @@ import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { Error, Form, Input, Swither, Title, Wrapper } from "../components/auth-components";
+import GithubButton from "../components/github-btn";
 
 // CreateAccount 컴포넌트 정의
 export default function CreateAccount(){
@@ -68,6 +69,7 @@ export default function CreateAccount(){
                 Don't have an account?{" "}
                 <Link to="/create-account">Create one</Link>
             </Swither>
+            <GithubButton />
         </Wrapper>
     )
 }
