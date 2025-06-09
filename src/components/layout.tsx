@@ -93,7 +93,6 @@ export default function Layout() {
           </MenuItem>
         </Link>
       </Menu>
-      <h2>layout!!</h2>
       <Outlet />
     </Wrapper>
   );
