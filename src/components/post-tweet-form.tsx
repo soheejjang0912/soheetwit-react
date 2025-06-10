@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { addDoc, collection } from "firebase/firestore";
+import { useState, type FormEvent } from "react";
 import styled from "styled-components";
+import { auth, db } from "../firebase";
 
 const Form = styled.form`
   display: flex;
@@ -65,9 +67,77 @@ export default function PostTweetForm() {
     }
   };
 
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+
+    if (!user || isLoading || tweet === "" || tweet.length > 180) return;
+
+    try {
+      setLoading(true);
+
+      let base64Image: string | null = null;
+      if (file) {
+        base64Image = await resizeImage(file, 500, 0.7); // 최대 너비 500px, 압축률 70%
+        if (base64Image.length > 1_048_487) {
+          alert("이미지 크기가 너무 큽니다. 다른 이미지를 선택해주세요.");
+          return;
+        }
+      }
+
+      await addDoc(collection(db, "tweets"), {
+        tweet,
+        createdAt: Date.now(),
+        username: user.displayName || "Anonymous",
+        userId: user.uid,
+        photo: base64Image,
+      });
+      setTweet("");
+      setFile(null);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resizeImage = (
+    file: File,
+    maxWidth = 500,
+    quality = 0.7
+  ): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        if (typeof reader.result !== "string") return reject("Invalid file");
+
+        image.src = reader.result;
+        image.onload = () => {
+          const canvas = document.createElement("canvas");
+          const scale = maxWidth / image.width;
+          canvas.width = maxWidth;
+          canvas.height = image.height * scale;
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return reject("Canvas not supported");
+
+          ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+          const resizedBase64 = canvas.toDataURL("image/jpeg", quality); // 압축률 0~1
+          resolve(resizedBase64);
+        };
+        image.onerror = reject;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   return (
-    <Form>
+    <Form onSubmit={onSubmit}>
       <TextArea
+        required
         rows={5}
         maxLength={180}
         onChange={onChange}
