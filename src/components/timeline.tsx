@@ -16,7 +16,7 @@ export interface ITweet {
   id: string;
   photo?: string;
   tweet: string;
-  useId: string;
+  userId: string;
   username: string;
   createdAt: number;
 }
@@ -39,24 +39,24 @@ export default function Timeline() {
       /* const snapshot = await getDocs(tweetsQuery); // 쿼리 결과 가져오기 getDocs
     // 각 문서를 ITweet 형태로 변환
     const tweets = snapshot.docs.map((doc) => {
-      const { tweet, createdAt, useId, username, photo } = doc.data();
+      const { tweet, createdAt, userId, username, photo } = doc.data();
       return {
         id: doc.id,
         tweet,
         createdAt,
-        useId,
+        userId,
         username,
         photo,
       };
     }); */
       unsubscribe = onSnapshot(tweetsQuery, (snapshot) => {
         const tweets = snapshot.docs.map((doc) => {
-          const { tweet, createdAt, useId, username, photo } = doc.data();
+          const { tweet, createdAt, userId, username, photo } = doc.data();
           return {
             id: doc.id,
             tweet,
             createdAt,
-            useId,
+            userId,
             username,
             photo,
           };
