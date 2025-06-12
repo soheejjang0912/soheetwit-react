@@ -13,9 +13,10 @@ import { auth } from "./firebase";
 import ProtectedRoute from "./components/protected-route";
 
 // 라우터 생성: 경로(path)와 해당 컴포넌트(element)를 연결하는 규칙 정의
-const router = createBrowserRouter([ // 배열을 router에 전달
+const router = createBrowserRouter([
+  // 배열을 router에 전달
   {
-    path:"/", // 어떤 경로에 대한 규칙인지 지정, 루트 경로
+    path: "/", // 어떤 경로에 대한 규칙인지 지정, 루트 경로
     element: (
       <ProtectedRoute>
         <Layout />
@@ -24,25 +25,25 @@ const router = createBrowserRouter([ // 배열을 router에 전달
     // element인 Layout 내부에서 <Outlet /> 위치에 랜더링될 자식 경로들 정의
     children: [
       {
-        path: "", 
-        element: <Home />
+        path: "",
+        element: <Home />,
       },
       {
         path: "profile",
-        element: <Profile />
+        element: <Profile />,
       },
-    ]
+    ],
   },
 
   {
     path: "/login",
-    element:<Login /> 
+    element: <Login />,
   },
   {
-    path: "/create-account", 
-    element: <CreateAccount /> 
-  }
-])
+    path: "/create-account",
+    element: <CreateAccount />,
+  },
+]);
 
 const GlobalStyles = createGlobalStyle`
   ${reset};
@@ -71,20 +72,22 @@ const Wrapper = styled.div`
 */
 function App() {
   const [isLoading, setLoading] = useState(true); // Firebase authentication
-  const init = async()=>{
+  const init = async () => {
     //wait for firebase
     await auth.authStateReady(); // 인증 상태가 준비되었는지를 기다림
-                                 // 최조 인증 상태가 완료될 때 실행되는 promise를 return 함
-                                 // 즉 Firebase가 쿠키와 토큰을 읽고 백엔드와 소통해서 로그인 여부를 확인하는 동안 기다리겠다는것
+    // 최조 인증 상태가 완료될 때 실행되는 promise를 return 함
+    // 즉 Firebase가 쿠키와 토큰을 읽고 백엔드와 소통해서 로그인 여부를 확인하는 동안 기다리겠다는것
     setLoading(false); // Firebase가 준비 되면 loading을 false로 변경
-  }
-  useEffect(()=>{
+  };
+  useEffect(() => {
     init();
   }, []);
-  return <Wrapper>
-    <GlobalStyles />
-    {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
-  </Wrapper>;
+  return (
+    <Wrapper>
+      <GlobalStyles />
+      {isLoading ? <LoadingScreen /> : <RouterProvider router={router} />}
+    </Wrapper>
+  );
 }
 
-export default App
+export default App;

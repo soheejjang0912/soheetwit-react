@@ -1,7 +1,6 @@
 {
   "name": "soheetwit",
   "private": true,
-  "homepage": "https://soheejjang0912.github.io/soheetwit-react/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
