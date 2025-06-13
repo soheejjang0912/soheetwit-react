@@ -10,6 +10,7 @@ const Wrapper = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 15px;
   gap: 20px;
+  overflow-y: auto;
 `;
 const TextColumn = styled.div`
   flex-direction: column;
