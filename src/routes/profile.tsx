@@ -1,7 +1,19 @@
 import styled from "styled-components";
 import { auth, db } from "../firebase";
 import { useEffect, useState } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import Tweet from "../components/tweet";
+import type { ITweet } from "../components/timeline";
 
 const Wrapper = styled.div`
   display: flex;
@@ -28,12 +40,19 @@ const AvatarInput = styled.input`
 const Name = styled.span`
   font-size: 22px;
 `;
+const Tweets = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`;
 
 export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
+  const [tweets, setTweets] = useState<ITweet[]>([]);
 
   useEffect(() => {
+    fecthTweets();
     const loadAvatar = async () => {
       if (!user) return;
       const docRef = doc(db, "avatars", user.uid);
@@ -43,7 +62,7 @@ export default function Profile() {
       }
     };
     loadAvatar();
-  }, [user]);
+  });
 
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -96,6 +115,30 @@ export default function Profile() {
     });
   };
 
+  const fecthTweets = async () => {
+    const tweetQuery = query(
+      collection(db, "tweets"),
+      where("userId", "==", user?.uid),
+      orderBy("createdAt", "desc"),
+      limit(25)
+    );
+    const snapshot = await getDocs(tweetQuery);
+    const tweets = snapshot.docs.map((doc) => {
+      const { tweet, createdAt, userId, username, photo } = doc.data();
+      return {
+        id: doc.id,
+        tweet,
+        createdAt,
+        userId,
+        username,
+        photo,
+      };
+    });
+    setTweets(tweets);
+
+    console.log("??????:" + tweets);
+  };
+
   return (
     <Wrapper>
       <AvatarUpload htmlFor="avatar">
@@ -123,6 +166,11 @@ export default function Profile() {
         accept="image/*"
       />
       <Name>{user?.displayName ?? "Anonyomous"}</Name>
+      <Tweets>
+        {tweets.map((tweet) => (
+          <Tweet key={tweet.id} {...tweet} />
+        ))}
+      </Tweets>
     </Wrapper>
   );
 }
