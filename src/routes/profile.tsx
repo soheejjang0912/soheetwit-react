@@ -135,8 +135,6 @@ export default function Profile() {
       };
     });
     setTweets(tweets);
-
-    console.log("??????:" + tweets);
   };
 
   return (
